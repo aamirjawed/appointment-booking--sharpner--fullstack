@@ -5,13 +5,13 @@ const userDetails = async (req,res) => {
     try {
         const {name, phone_no, email} = req.body;
 
-        const user = User.create({
+        const user = await User.create({
             name:name,
             phone_no:phone_no,
             email:email
         })
 
-        res.status(200).json(`User with ${name} has been created`)
+        res.status(200).json({user})
     } catch (error) {
         console.log(error)
         res.status(500).json({message:"Something went wrong while creating user. Please try again!"})
@@ -22,7 +22,7 @@ const getUserDetails = async (req, res) => {
     try {
         const allUsers = await User.findAll()
 
-        res.status(200).json(allUsers)
+        res.status(200).json({allUsers})
     } catch (error) {
         res.status(500).json({message:"Something went wrong while fetching the users"})
     }
@@ -73,4 +73,19 @@ const deleteUser = async(req,res) => {
         }
 }
 
-module.exports = {userDetails, getUserDetails,updateUser, deleteUser}
+const getSingleUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching user data" });
+    }
+};
+
+module.exports = {userDetails, getUserDetails,updateUser, deleteUser, getSingleUser}
